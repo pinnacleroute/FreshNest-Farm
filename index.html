@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FreshNest Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-dark: #1a3a08; --green-mid: #3a6020; --green-light: #5a7a3a;
+    --green-pale: #e8f0da; --green-palest: #f7f4ef;
+    --red: #c0392b; --orange: #e67e22; --blue: #2980b9; --purple: #8e44ad;
+    --green-success: #27ae60;
+    --text-dark: #2c2c2c; --text-mid: #555; --text-muted: #888; --text-light: #aaa;
+    --border: #f0ece6; --border-mid: #d0c8bc;
+    --white: #ffffff; --bg: #f7f4ef;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  /* ---- NAV ---- */
+  #main-nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
+    height: 64px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  }
+  .nav-brand { cursor: pointer; display: flex; align-items: center; gap: 10px; }
+  .nav-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 18px; color: #2d5016; letter-spacing: -0.5px; }
+  .nav-brand-sub { font-size: 10px; color: #7a9a5a; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-top: -2px; }
+  .nav-btns { display: flex; align-items: center; gap: 8px; }
+  .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; font-size: 14px; font-weight: 500; background: transparent; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .btn-primary { background: var(--green-mid) !important; color: #fff !important; border-color: var(--green-mid) !important; }
+  .btn-admin { background: #f5e6d0 !important; color: #8b5e2a !important; border-color: #d4a96a !important; }
+  #sub-nav { background: var(--green-dark); padding: 8px 24px; display: flex; gap: 16px; justify-content: center; overflow-x: auto; }
+  .sub-btn { background: transparent; color: #d0e8a0; border: 1px solid transparent; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .sub-btn.active { background: #3a6020; border-color: #5a9040; }
+
+  /* ---- SHARED ---- */
+  .card { background: var(--white); border-radius: 16px; padding: 20px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid var(--border); }
+  .page { display: none; }
+  .page.active { display: block; }
+  .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block; }
+  .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; flex-shrink: 0; }
+  .label-style { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #444; }
+  .input-style { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid var(--border-mid); font-size: 14px; font-family: 'DM Sans', sans-serif; background: #faf9f7; }
+  .input-style:focus { outline: none; border-color: var(--green-mid); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .mini-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; font-size: 12px; font-weight: 600; background: #f7f4ef; color: #555; font-family: 'DM Sans', sans-serif; }
+
+  /* ---- LANDING ---- */
+  .hero { background: linear-gradient(135deg, #f7f0e4 0%, #e8f0da 60%, #d4e8b8 100%); padding: 80px 24px 60px; text-align: center; position: relative; overflow: hidden; }
+  .hero-badge { background: var(--green-mid); color: #fff; display: inline-block; padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; letter-spacing: 0.5px; }
+  .hero h1 { font-size: clamp(32px, 5vw, 58px); font-weight: 900; color: var(--green-dark); line-height: 1.15; margin: 0 0 20px; letter-spacing: -1px; }
+  .hero-sub { font-size: 20px; color: #4a6030; max-width: 580px; margin: 0 auto 16px; line-height: 1.65; }
+  .hero-note { font-size: 15px; color: #6a8050; margin-bottom: 36px; }
+  .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .hero-btn { color: #fff; border: none; padding: 16px 32px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .hero-btn-orlando { background: var(--green-mid); box-shadow: 0 4px 16px rgba(58,96,32,0.3); }
+  .hero-btn-miami { background: var(--red); box-shadow: 0 4px 16px rgba(192,57,43,0.3); }
+  .section { padding: 60px 24px; }
+  .section-inner { max-width: 880px; margin: 0 auto; }
+  .section-title { text-align: center; font-size: 32px; color: var(--green-dark); margin-bottom: 48px; font-weight: 800; }
+  .auto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+  .freshness-card { border-radius: 16px; padding: 28px; text-align: center; }
+  .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+  .step-card { background: var(--white); border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--green-mid); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; margin: 0 auto 12px; }
+  .zone-card { border-left: 4px solid var(--green-mid); }
+  .zone-card.kiosk { border-color: var(--blue); }
+  .zone-tag { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin-top: 10px; }
+  .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+  .cta-section { background: var(--green-dark); padding: 70px 24px; text-align: center; }
+  .elig-section { background: #e8f0da; padding: 60px 24px; }
+  .elig-inner { max-width: 540px; margin: 0 auto; }
+
+  /* ---- FOOTER ---- */
+  footer { background: #0f2006; padding: 28px 24px; text-align: center; }
+
+  /* ---- SIGNUP/LOGIN ---- */
+  .form-page-inner { max-width: 540px; margin: 0 auto; }
+  .form-page-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ---- DASHBOARD ---- */
+  .dashboard-inner { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+  .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { padding: 10px 12px; text-align: left; font-weight: 600; color: #555; background: #f7f4ef; white-space: nowrap; }
+  td { padding: 12px; border-bottom: 1px solid var(--border); }
+  .overflow-x { overflow-x: auto; }
+
+  /* ---- ORDER PAGE ---- */
+  .order-inner { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+  .step-progress { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+  .step-connector { width: 40px; height: 2px; align-self: center; }
+  .product-card { background: var(--white); border-radius: 14px; padding: 18px 20px; cursor: pointer; border: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; transition: border-color 0.15s; }
+  .product-card.selected { border-color: var(--green-mid); }
+  .slot-card { background: var(--white); border-radius: 12px; padding: 14px 18px; cursor: pointer; border: 2px solid var(--border); margin-bottom: 10px; font-weight: 400; color: #333; font-size: 14px; transition: all 0.15s; }
+  .slot-card.selected { border-color: var(--green-mid); font-weight: 700; color: var(--green-mid); }
+  .method-card { background: var(--white); border-radius: 14px; padding: 18px 20px; cursor: pointer; border: 2px solid var(--border); margin-bottom: 14px; transition: border-color 0.15s; }
+  .method-card.selected { border-color: var(--green-mid); }
+
+  /* ---- KIOSK ---- */
+  .qr-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px; }
+  .qr-cell { width: 10px; height: 10px; border-radius: 1px; }
+
+  /* ---- NOTIFICATIONS ---- */
+  .notif-card { border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+
+  /* ---- EGGSCAPE ---- */
+  .game-area { position: relative; background: linear-gradient(135deg, #e8f0da, #f7f4ef); border-radius: 16px; height: 200px; overflow: hidden; border: 2px solid #d0e0b8; cursor: crosshair; }
+  .egg-target { position: absolute; font-size: 28px; cursor: pointer; user-select: none; transition: transform 0.1s; }
+  .egg-target:hover { transform: scale(1.2); }
+  .leaderboard-row { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; }
+  .leaderboard-row.gold { background: #fef9f0; border: 2px solid #f0ad4e; }
+  .rank-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff; flex-shrink: 0; }
+
+  /* ---- ADMIN ---- */
+  .admin-inner { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+  .admin-tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+  .tab-btn { padding: 8px 16px; border-radius: 8px; border: 1.5px solid #ddd; background: var(--white); color: #555; font-weight: 600; cursor: pointer; font-size: 13px; white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .tab-btn.active { background: var(--green-mid); color: #fff; border-color: var(--green-mid); }
+
+  /* ---- UGC ---- */
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .upload-area { background: #f7f4ef; border-radius: 10px; border: 2px dashed #d0c8bc; padding: 28px 20px; text-align: center; cursor: pointer; }
+
+  /* ---- UTILITY ---- */
+  .flex { display: flex; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .gap-16 { gap: 16px; }
+  .text-center { text-align: center; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-20 { margin-top: 20px; }
+  .mb-4 { margin-bottom: 4px; }
+  .mb-6 { margin-bottom: 6px; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-12 { margin-bottom: 12px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-20 { margin-bottom: 20px; }
+  .mb-24 { margin-bottom: 24px; }
+  .mb-28 { margin-bottom: 28px; }
+  .hidden { display: none !important; }
+  @media (max-width: 640px) {
+    .dash-grid { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-brand" onclick="navigate('landing')">
+    <span style="font-size:28px">🥚</span>
+    <div>
+      <div class="nav-brand-name">FreshNest</div>
+      <div class="nav-brand-sub">Farm to Door</div>
+    </div>
+  </div>
+  <div class="nav-btns" id="nav-btns">
+    <!-- filled by JS -->
+  </div>
+</nav>
+
+<div id="sub-nav"><!-- filled by JS --></div>
+
+<main id="main-content">
+
+<!-- ===== LANDING PAGE ===== -->
+<div id="page-landing" class="page">
+  <div class="hero">
+    <div style="position:absolute;top:20px;right:60px;font-size:80px;opacity:.15">🐓</div>
+    <div style="position:absolute;bottom:10px;left:40px;font-size:60px;opacity:.12">🥚</div>
+    <div style="max-width:760px;margin:0 auto">
+      <div class="hero-badge">🌾 Beta Launch — Orlando &amp; Miami</div>
+      <h1>Eggs so fresh,<br/>the hen still remembers.</h1>
+      <p class="hero-sub">Ultra-fresh eggs delivered in under <strong>10 days</strong> from our family farm to your doorstep. Most grocery store eggs are <strong style="color:#c0392b">60–90 days old</strong> by the time you crack them.</p>
+      <p class="hero-note">That's not food. That's a storage experiment. We're changing that.</p>
+      <div class="hero-btns">
+        <button class="hero-btn hero-btn-orlando" onclick="navigate('signup')">🌿 Join the Orlando Beta</button>
+        <button class="hero-btn hero-btn-miami" onclick="navigate('signup')">🌊 Join the Miami Beta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Problem -->
+  <div class="section" style="background:#fff">
+    <div class="section-inner">
+      <h2 class="section-title">The 90-Day Grocery Egg Problem</h2>
+      <p style="text-align:center;color:#666;font-size:16px;margin-bottom:48px;max-width:600px;margin-left:auto;margin-right:auto">USDA regulations allow eggs to sit 30 days in a facility before refrigeration, then up to 45 days in retail. Your "fresh" eggs could be 90 days old.</p>
+      <div class="auto-grid">
+        <div class="freshness-card" style="background:#fdf2f0;border:2px solid #c0392b22">
+          <div style="font-size:40px;margin-bottom:12px">📅</div>
+          <div style="font-weight:700;color:#333;margin-bottom:8px">Grocery Store Eggs</div>
+          <div style="font-size:22px;font-weight:800;color:#c0392b">60–90 days old</div>
+        </div>
+        <div class="freshness-card" style="background:#fef9f0;border:2px solid #e67e2222">
+          <div style="font-size:40px;margin-bottom:12px">🏪</div>
+          <div style="font-weight:700;color:#333;margin-bottom:8px">Farmers Market Eggs</div>
+          <div style="font-size:22px;font-weight:800;color:#e67e22">14–21 days old</div>
+        </div>
+        <div class="freshness-card" style="background:#f0faf3;border:2px solid #27ae6022">
+          <div style="font-size:40px;margin-bottom:12px">🥚</div>
+          <div style="font-weight:700;color:#333;margin-bottom:8px">FreshNest Eggs</div>
+          <div style="font-size:22px;font-weight:800;color:#27ae60">Under 10 days old</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section" style="background:var(--bg)">
+    <div class="section-inner">
+      <h2 class="section-title">How FreshNest Works</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num flex-center">1</div><div style="font-size:28px;margin-bottom:10px">📋</div><div style="font-weight:700;color:var(--green-dark);margin-bottom:8px">Join the Beta</div><div style="font-size:14px;color:#666;line-height:1.6">Sign up in under 2 minutes. Tell us your area and delivery preference.</div></div>
+        <div class="step-card"><div class="step-num flex-center">2</div><div style="font-size:28px;margin-bottom:10px">🛒</div><div style="font-weight:700;color:var(--green-dark);margin-bottom:8px">Place Your Order</div><div style="font-size:14px;color:#666;line-height:1.6">Choose your pack size, delivery window, and method.</div></div>
+        <div class="step-card"><div class="step-num flex-center">3</div><div style="font-size:28px;margin-bottom:10px">🐔</div><div style="font-weight:700;color:var(--green-dark);margin-bottom:8px">Eggs Are Packed</div><div style="font-size:14px;color:#666;line-height:1.6">Your order triggers same-day packing at our family farm.</div></div>
+        <div class="step-card"><div class="step-num flex-center">4</div><div style="font-size:28px;margin-bottom:10px">🚚</div><div style="font-weight:700;color:var(--green-dark);margin-bottom:8px">Delivered Fresh</div><div style="font-size:14px;color:#666;line-height:1.6">Truck, smart locker, or drone — under 10 days guaranteed.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eligibility -->
+  <div class="elig-section">
+    <div class="elig-inner">
+      <h2 style="text-align:center;font-size:28px;color:var(--green-dark);margin-bottom:8px;font-weight:800">Check Your Delivery Zone</h2>
+      <p style="text-align:center;color:#5a7a3a;margin-bottom:28px">Enter your address to see if you're eligible for delivery, kiosk pickup, or the drone beta.</p>
+      <div class="card">
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <button id="city-orlando" onclick="setCity('Orlando')" class="btn" style="flex:1;border:2px solid var(--green-mid);background:var(--green-mid);color:#fff;font-weight:600">Orlando</button>
+          <button id="city-miami" onclick="setCity('Miami')" class="btn" style="flex:1;border:2px solid #ddd;background:#fff;color:#555;font-weight:600">Miami</button>
+        </div>
+        <input id="elig-addr" placeholder="Enter your full address..." class="input-style" style="margin-bottom:12px" />
+        <button onclick="checkEligibility()" style="width:100%;background:var(--green-mid);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Check Eligibility →</button>
+        <div id="elig-result" style="display:none;margin-top:16px;padding:14px 16px;border-radius:10px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delivery Zones -->
+  <div class="section" style="background:#fff">
+    <div class="section-inner">
+      <h2 class="section-title">Beta Delivery Areas</h2>
+      <div class="auto-grid">
+        <div class="card zone-card"><div style="font-size:24px;margin-bottom:8px">🌾</div><div style="font-weight:700;font-size:15px;color:var(--green-dark);margin-bottom:4px">Orlando Farm Hub</div><div style="font-size:13px;color:#888">5-mile radius</div><span class="zone-tag" style="background:#e8f0da;color:var(--green-mid)">Home Delivery</span></div>
+        <div class="card zone-card"><div style="font-size:24px;margin-bottom:8px">🌾</div><div style="font-weight:700;font-size:15px;color:var(--green-dark);margin-bottom:4px">Miami Beta Hub</div><div style="font-size:13px;color:#888">3-mile radius</div><span class="zone-tag" style="background:#e8f0da;color:var(--green-mid)">Home Delivery</span></div>
+        <div class="card zone-card kiosk"><div style="font-size:24px;margin-bottom:8px">📦</div><div style="font-weight:700;font-size:15px;color:var(--green-dark);margin-bottom:4px">Smart Locker – Orlando Downtown</div><div style="font-size:13px;color:#888">150 E Church St, Orlando, FL 32801</div><span class="zone-tag" style="background:#eaf4fb;color:var(--blue)">Smart Locker</span></div>
+        <div class="card zone-card kiosk"><div style="font-size:24px;margin-bottom:8px">📦</div><div style="font-weight:700;font-size:15px;color:var(--green-dark);margin-bottom:4px">Smart Locker – Miami Brickell</div><div style="font-size:13px;color:#888">801 Brickell Bay Dr, Miami, FL 33131</div><span class="zone-tag" style="background:#eaf4fb;color:var(--blue)">Smart Locker</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="section" style="background:var(--bg)">
+    <div class="section-inner">
+      <h2 class="section-title">What Beta Customers Say</h2>
+      <div class="testimonial-grid">
+        <div class="card"><div style="font-size:20px;margin-bottom:12px">⭐⭐⭐⭐⭐</div><p style="font-size:15px;color:#444;line-height:1.7;font-style:italic;font-family:'Playfair Display',serif;margin-bottom:16px">"I cracked the egg and the yolk was SO orange. I didn't know eggs could taste like this. My grocery eggs taste like water now."</p><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="width:36px;height:36px;background:#5a7a3a;font-size:13px">JL</div><div><div style="font-weight:700;font-size:14px">Jennifer L.</div><div style="font-size:12px;color:#888">Orlando Beta Customer</div></div></div></div>
+        <div class="card"><div style="font-size:20px;margin-bottom:12px">⭐⭐⭐⭐⭐</div><p style="font-size:15px;color:#444;line-height:1.7;font-style:italic;font-family:'Playfair Display',serif;margin-bottom:16px">"The freshness score is real. Got my order 6 days after packing. You can literally smell the difference from the carton."</p><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="width:36px;height:36px;background:#5a7a3a;font-size:13px">DM</div><div><div style="font-weight:700;font-size:14px">David M.</div><div style="font-size:12px;color:#888">Miami Beta Customer</div></div></div></div>
+        <div class="card"><div style="font-size:20px;margin-bottom:12px">⭐⭐⭐⭐⭐</div><p style="font-size:15px;color:#444;line-height:1.7;font-style:italic;font-family:'Playfair Display',serif;margin-bottom:16px">"My kids ask for eggs every morning now. That's never happened before. The drone beta sign-up was seamless too!"</p><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="width:36px;height:36px;background:#5a7a3a;font-size:13px">AT</div><div><div style="font-weight:700;font-size:14px">Amanda T.</div><div style="font-size:12px;color:#888">Orlando Beta Customer</div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2 style="color:#fff;font-size:34px;margin-bottom:12px;font-weight:800">Ready to taste the difference?</h2>
+    <p style="color:#a8d080;font-size:17px;margin-bottom:36px">Join hundreds of families already on the beta waitlist.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <button onclick="navigate('signup')" style="background:#6abf40;color:#fff;border:none;padding:16px 36px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Join the Beta Waitlist →</button>
+      <button onclick="navigate('eggscape')" style="background:transparent;color:#fff;border:2px solid #6abf40;padding:16px 36px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Play The Great Eggscape 🎮</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SIGNUP PAGE ===== -->
+<div id="page-signup" class="page" style="background:var(--bg);min-height:100vh;padding:40px 24px">
+  <div id="signup-form-wrap">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="form-page-icon">🌾</div>
+      <h1 style="font-size:28px;color:var(--green-dark);margin-bottom:8px">Join the Beta Waitlist</h1>
+      <p style="color:#666">Be among the first to receive ultra-fresh eggs in Orlando or Miami.</p>
+    </div>
+    <div class="card form-page-inner">
+      <div style="display:grid;gap:16px">
+        <div class="grid-2">
+          <div><label class="label-style">Full Name</label><input id="su-name" class="input-style" placeholder="Jane Smith" /></div>
+          <div><label class="label-style">Phone</label><input id="su-phone" class="input-style" placeholder="407-555-0100" /></div>
+        </div>
+        <div><label class="label-style">Email Address</label><input id="su-email" class="input-style" placeholder="jane@example.com" /></div>
+        <div><label class="label-style">City</label>
+          <select id="su-city" class="input-style"><option>Orlando</option><option>Miami</option></select>
+        </div>
+        <div><label class="label-style">Delivery Address</label><input id="su-address" class="input-style" placeholder="123 Main St, Orlando, FL 32801" /></div>
+        <div class="grid-2">
+          <div><label class="label-style">Preferred Delivery</label>
+            <select id="su-delivery" class="input-style">
+              <option value="home">Home Delivery</option>
+              <option value="kiosk">Kiosk Pickup</option>
+              <option value="drone">Drone Beta</option>
+            </select>
+          </div>
+          <div><label class="label-style">Household Size</label>
+            <select id="su-household" class="input-style">
+              <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5+</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="submitSignup()" style="background:var(--green-mid);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px">Join Beta Waitlist 🌿</button>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:16px;font-size:13px;color:#888">Already have an account? <span onclick="navigate('login')" style="color:var(--green-mid);cursor:pointer;font-weight:600">Log in</span></p>
+  </div>
+  <div id="signup-success" class="hidden" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+    <div class="card" style="max-width:480px;text-align:center">
+      <div style="font-size:60px;margin-bottom:16px">🎉</div>
+      <h2 style="color:var(--green-dark);font-size:26px;margin-bottom:12px">You're on the list!</h2>
+      <p style="color:#666;line-height:1.7;margin-bottom:20px">Thanks! You've joined the FreshNest beta waitlist. We'll email you when delivery opens in your area.</p>
+      <div style="background:#e8f0da;border-radius:10px;padding:14px 20px;margin-bottom:20px">
+        <div style="font-weight:700;color:var(--green-mid);font-size:15px;margin-bottom:4px">✅ Beta Confirmation Sent</div>
+        <div style="font-size:13px;color:#5a7a3a">Check your inbox for your welcome email + Eggscape invite.</div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button onclick="navigate('login')" style="flex:1;background:var(--green-mid);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif">Login to Dashboard</button>
+        <button onclick="navigate('eggscape')" style="flex:1;background:#f7f4ef;color:var(--red);border:2px solid var(--red);padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif">Play Eggscape 🎮</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="page-login" class="page" style="background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:400px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:48px;margin-bottom:10px">🥚</div>
+      <h1 style="font-size:26px;color:var(--green-dark);margin-bottom:6px">Welcome back</h1>
+      <p style="color:#888;font-size:14px">Sign in to your FreshNest account</p>
+    </div>
+    <div class="card">
+      <div style="display:grid;gap:14px">
+        <div><label class="label-style">Email</label><input id="login-email" class="input-style" placeholder="emily@example.com" /></div>
+        <div><label class="label-style">Password</label><input type="password" id="login-pass" class="input-style" placeholder="••••••••" /></div>
+        <div id="login-error" style="display:none;color:var(--red);font-size:13px;background:#fdf2f0;padding:10px 14px;border-radius:8px"></div>
+        <button onclick="doLogin()" style="background:var(--green-mid);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Login</button>
+        <div style="text-align:center;font-size:13px;color:#888">
+          <div>Demo accounts: emily@example.com / pass</div>
+          <div>marcus@example.com / pass</div>
+        </div>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:16px;font-size:13px;color:#888">New customer? <span onclick="navigate('signup')" style="color:var(--green-mid);cursor:pointer;font-weight:600">Join the beta</span></p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD PAGE ===== -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard-inner">
+    <div class="dash-header">
+      <div style="display:flex;gap:14px;align-items:center">
+        <div id="dash-avatar" class="avatar" style="width:52px;height:52px;background:var(--green-mid);font-size:18px"></div>
+        <div>
+          <h1 id="dash-welcome" style="font-size:22px;color:var(--green-dark);margin-bottom:2px"></h1>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="dash-city" style="font-size:13px;color:#888"></span>
+            <span id="dash-elig" class="status-badge"></span>
+          </div>
+        </div>
+      </div>
+      <button onclick="navigate('order')" style="background:var(--green-mid);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif">+ Order Eggs</button>
+    </div>
+    <div class="stats-grid">
+      <div class="card" style="text-align:center"><div style="font-size:13px;color:#888;margin-bottom:6px">Total Orders</div><div id="stat-orders" style="font-size:20px;font-weight:800;color:var(--green-dark)">0</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:13px;color:#888;margin-bottom:6px">Freshness Score</div><div style="font-size:20px;font-weight:800;color:var(--green-dark)">9.8/10 🥚</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:13px;color:#888;margin-bottom:6px">Eggs Ordered</div><div id="stat-eggs" style="font-size:20px;font-weight:800;color:var(--green-dark)">0+</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:13px;color:#888;margin-bottom:6px">Member Since</div><div id="stat-joined" style="font-size:20px;font-weight:800;color:var(--green-dark)">—</div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="card">
+        <h3 style="font-size:15px;font-weight:700;color:var(--green-dark);margin-bottom:16px">Active Order</h3>
+        <div id="active-order-content"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:15px;font-weight:700;color:var(--green-dark);margin-bottom:16px">My Profile</h3>
+        <div id="profile-content"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px;font-weight:700;color:var(--green-dark);margin-bottom:16px">Order History</h3>
+      <div class="overflow-x">
+        <table>
+          <thead><tr><th>Order ID</th><th>Product</th><th>Method</th><th>Order Date</th><th>Freshness</th><th>Status</th><th>Amount</th></tr></thead>
+          <tbody id="order-history-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ORDER PAGE ===== -->
+<div id="page-order" class="page" style="background:var(--bg);min-height:100vh">
+  <div class="order-inner">
+    <div style="text-align:center;margin-bottom:28px">
+      <h1 style="font-size:26px;color:var(--green-dark);margin-bottom:16px">Order Ultra-Fresh Eggs</h1>
+      <div class="step-progress" id="step-progress"></div>
+    </div>
+    <div id="order-step-1">
+      <h2 style="font-size:18px;color:var(--green-dark);margin-bottom:16px">Choose Your Pack</h2>
+      <div id="products-list"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <span style="font-size:14px;color:#555">Quantity:</span>
+        <button class="qty-btn active-qty" data-qty="1" onclick="setQty(1)" style="width:36px;height:36px;border-radius:8px;border:2px solid var(--green-mid);background:var(--green-mid);color:#fff;font-weight:700;cursor:pointer">1</button>
+        <button class="qty-btn" data-qty="2" onclick="setQty(2)" style="width:36px;height:36px;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:700;cursor:pointer">2</button>
+        <button class="qty-btn" data-qty="3" onclick="setQty(3)" style="width:36px;height:36px;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:700;cursor:pointer">3</button>
+      </div>
+      <button id="step1-next" onclick="goOrderStep(2)" disabled style="width:100%;background:#ccc;color:#fff;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:not-allowed;font-size:15px;font-family:'DM Sans',sans-serif">Next: Choose Delivery →</button>
+    </div>
+    <div id="order-step-2" class="hidden">
+      <h2 style="font-size:18px;color:var(--green-dark);margin-bottom:16px">Choose Delivery Method</h2>
+      <div id="methods-list"></div>
+      <div style="display:flex;gap:12px">
+        <button onclick="goOrderStep(1)" class="btn" style="flex:1;background:#fff;color:#555">← Back</button>
+        <button id="step2-next" onclick="goOrderStep(3)" disabled style="flex:2;background:#ccc;color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:not-allowed;font-size:14px;font-family:'DM Sans',sans-serif">Next: Schedule →</button>
+      </div>
+    </div>
+    <div id="order-step-3" class="hidden">
+      <h2 style="font-size:18px;color:var(--green-dark);margin-bottom:16px">Choose Delivery Slot</h2>
+      <div id="slots-list"></div>
+      <div style="display:flex;gap:12px">
+        <button onclick="goOrderStep(2)" class="btn" style="flex:1;background:#fff;color:#555">← Back</button>
+        <button id="step3-next" onclick="goOrderStep(4)" disabled style="flex:2;background:#ccc;color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:not-allowed;font-family:'DM Sans',sans-serif">Next: Review →</button>
+      </div>
+    </div>
+    <div id="order-step-4" class="hidden">
+      <h2 style="font-size:18px;color:var(--green-dark);margin-bottom:16px">Review &amp; Confirm</h2>
+      <div class="card" style="margin-bottom:16px">
+        <div id="review-details" style="display:grid;gap:10px"></div>
+      </div>
+      <div style="background:#f7f4ef;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:13px;color:#888">💳 Payment placeholder — in production this connects to Stripe or Square. For beta, orders are pre-authorized.</div>
+      <div style="display:flex;gap:12px">
+        <button onclick="goOrderStep(3)" class="btn" style="flex:1;background:#fff;color:#555">← Back</button>
+        <button onclick="placeOrder()" style="flex:2;background:var(--green-mid);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;font-family:'DM Sans',sans-serif">Place Order 🥚</button>
+      </div>
+    </div>
+    <div id="order-confirmed" class="hidden" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+      <div class="card" style="max-width:480px;text-align:center">
+        <div style="font-size:60px;margin-bottom:12px">✅</div>
+        <h2 style="color:var(--green-dark);font-size:24px;margin-bottom:8px">Order Confirmed!</h2>
+        <p style="color:#666;line-height:1.7;margin-bottom:20px">Your eggs were packed fresh today. Freshness guarantee: under 10 days. Estimated delivery: <strong id="confirmed-slot"></strong>.</p>
+        <div style="background:#e8f0da;border-radius:10px;padding:14px 20px;margin-bottom:20px">
+          <div id="confirmed-summary" style="font-size:14px;color:var(--green-mid);line-height:1.8"></div>
+        </div>
+        <div id="drone-note" style="display:none;background:#f4eafb;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#8e44ad">🚁 Drone delivery is in manual review. An admin will approve your batch within 4 hours.</div>
+        <div style="display:flex;gap:12px">
+          <button onclick="navigate('dashboard')" style="flex:1;background:var(--green-mid);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif">View Dashboard</button>
+          <button id="get-qr-btn" onclick="navigate('kiosk')" style="display:none;flex:1;background:var(--blue);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif">Get QR Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== KIOSK PAGE ===== -->
+<div id="page-kiosk" class="page" style="background:var(--bg);min-height:100vh;padding:32px 24px">
+  <div style="max-width:480px;margin:0 auto">
+    <h1 style="font-size:24px;color:var(--green-dark);text-align:center;margin-bottom:24px">Kiosk Pickup</h1>
+    <div id="kiosk-no-order" class="hidden" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+      <div class="card" style="max-width:400px;text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">📦</div>
+        <h2 style="color:var(--green-dark)">No Kiosk Orders Ready</h2>
+        <p style="color:#888;margin-top:8px">You have no kiosk pickup orders with a QR code ready. Place a kiosk pickup order first.</p>
+      </div>
+    </div>
+    <div id="kiosk-redeemed" class="hidden">
+      <div class="card" style="max-width:400px;text-align:center;margin:60px auto 0">
+        <div style="font-size:60px;margin-bottom:12px">✅</div>
+        <h2 style="color:var(--green-dark)">Picked Up Successfully!</h2>
+        <p style="color:#666;line-height:1.7;margin-top:8px">Your order has been marked as picked up. Enjoy your ultra-fresh eggs!</p>
+        <div style="margin-top:16px;background:#e8f0da;border-radius:10px;padding:14px;font-size:14px;color:var(--green-mid)">Freshness: guaranteed under 10 days from pack date 🥚</div>
+      </div>
+    </div>
+    <div id="kiosk-main">
+      <div class="card" style="text-align:center;margin-bottom:20px">
+        <div id="kiosk-order-id" style="font-size:14px;color:#888;margin-bottom:8px"></div>
+        <div id="kiosk-product" style="font-weight:700;font-size:18px;color:var(--green-dark);margin-bottom:4px"></div>
+        <span class="status-badge" style="background:#eaf4fb;color:var(--blue)">QR Ready</span>
+        <div style="margin:20px auto;width:160px;height:160px;background:#fff;border:3px solid var(--green-dark);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative">
+          <div id="qr-grid" class="qr-grid"></div>
+          <div id="qr-code-label" style="position:absolute;bottom:-24px;font-size:12px;font-weight:700;color:var(--blue);font-family:monospace;letter-spacing:1px"></div>
+        </div>
+        <div style="margin-top:32px;background:#eaf4fb;border-radius:10px;padding:14px 16px;margin-bottom:16px">
+          <div style="font-weight:700;color:var(--blue);margin-bottom:6px;font-size:14px">📍 Pickup Location</div>
+          <div id="kiosk-location" style="font-size:13px;color:#555"></div>
+        </div>
+        <div style="background:#fef9f0;border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#e67e22">⏰ QR code expires in 48 hours from issuance</div>
+        <button onclick="redeemKiosk()" style="width:100%;background:var(--green-mid);color:#fff;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;font-family:'DM Sans',sans-serif">Scan &amp; Redeem QR Code</button>
+      </div>
+      <div class="card">
+        <h3 style="font-size:14px;font-weight:700;color:var(--green-dark);margin-bottom:12px">Pickup Instructions</h3>
+        <div id="kiosk-steps"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NOTIFICATIONS PAGE ===== -->
+<div id="page-notifications" class="page" style="background:var(--bg);min-height:100vh;padding:32px 24px">
+  <div style="max-width:720px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:32px">
+      <h1 style="font-size:26px;color:var(--green-dark);margin-bottom:8px">Notification Center</h1>
+      <p style="color:#888">Simulated transactional messages — showing how FreshNest communicates with customers at every step.</p>
+    </div>
+    <div id="notifications-list"></div>
+    <div style="margin-top:24px;background:#fff8f0;border-radius:12px;padding:16px 20px;border:1px solid #f0d8b8;font-size:13px;color:#8b5e2a">
+      <strong>Production note:</strong> In production, emails connect via SendGrid or Postmark. SMS sends via Twilio. Notification templates are stored in Supabase and triggered by order status webhooks via serverless functions.
+    </div>
+  </div>
+</div>
+
+<!-- ===== EGGSCAPE PAGE ===== -->
+<div id="page-eggscape" class="page" style="background:linear-gradient(135deg,#fff8e8,#e8f5da);min-height:100vh">
+  <div style="background:linear-gradient(135deg,#c0392b,#e74c3c);padding:50px 24px;text-align:center;color:#fff">
+    <div style="font-size:60px;margin-bottom:12px">🥚🏃</div>
+    <h1 style="font-size:clamp(28px,5vw,50px);font-weight:900;margin-bottom:12px;letter-spacing:-1px">The Great Eggscape</h1>
+    <p style="font-size:17px;opacity:.9;max-width:520px;margin:0 auto 28px">Catch runaway eggs, share your breakfast story, and earn points for beta perks, discounts, and early access.</p>
+    <button id="eggscape-join-btn" onclick="navigate('signup')" style="background:#fff;color:#c0392b;border:none;padding:14px 30px;border-radius:12px;font-weight:800;cursor:pointer;font-size:15px;font-family:'DM Sans',sans-serif">Join to Earn Rewards →</button>
+  </div>
+  <div style="max-width:960px;margin:0 auto;padding:40px 24px">
+    <!-- Mini Game -->
+    <div class="card" style="margin-bottom:28px">
+      <h2 style="font-size:20px;color:var(--green-dark);margin-bottom:8px">🎮 Catch the Runaway Eggs!</h2>
+      <p style="color:#888;font-size:14px;margin-bottom:16px">Tap the eggs before they escape. Earn 10 Eggscape Points per catch. Score 100+ to unlock a discount.</p>
+      <div id="game-start-wrap" style="text-align:center;padding:20px 0">
+        <button onclick="startGame()" style="background:var(--red);color:#fff;border:none;padding:14px 32px;border-radius:12px;font-weight:800;cursor:pointer;font-size:16px;font-family:'DM Sans',sans-serif">🥚 Start Game</button>
+      </div>
+      <div id="game-active-wrap" class="hidden">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+          <span id="game-score" style="font-weight:700;color:var(--green-mid)">Score: 0 pts</span>
+          <span id="game-timer" style="font-weight:700;color:#555">⏱ 20s</span>
+        </div>
+        <div id="game-area" class="game-area" style="height:200px">
+          <div id="game-overlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;display:none">
+            <div style="text-align:center">
+              <div id="game-over-score" style="font-size:28px;font-weight:800;color:var(--green-dark)"></div>
+              <div id="game-discount" style="color:var(--red);font-weight:700;margin-top:6px;display:none">🎉 10% Discount Unlocked!</div>
+              <button onclick="startGame()" style="margin-top:12px;background:var(--green-mid);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Play Again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Points -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px">
+      <div class="card" style="text-align:center;border:2px solid #c0392b22"><div style="font-size:32px;margin-bottom:8px">🎮</div><div style="font-weight:700;font-size:14px;color:var(--green-dark);margin-bottom:4px">Play mini-game</div><div style="font-size:18px;font-weight:800;color:#c0392b">+10/catch</div></div>
+      <div class="card" style="text-align:center;border:2px solid #e67e2222"><div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-weight:700;font-size:14px;color:var(--green-dark);margin-bottom:4px">Upload breakfast photo</div><div style="font-size:18px;font-weight:800;color:#e67e22">+200 pts</div></div>
+      <div class="card" style="text-align:center;border:2px solid #27ae6022"><div style="font-size:32px;margin-bottom:8px">📖</div><div style="font-weight:700;font-size:14px;color:var(--green-dark);margin-bottom:4px">Share your egg story</div><div style="font-size:18px;font-weight:800;color:#27ae60">+150 pts</div></div>
+      <div class="card" style="text-align:center;border:2px solid #2980b922"><div style="font-size:32px;margin-bottom:8px">👥</div><div style="font-weight:700;font-size:14px;color:var(--green-dark);margin-bottom:4px">Refer a friend</div><div style="font-size:18px;font-weight:800;color:#2980b9">+500 pts</div></div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="card" style="margin-bottom:28px">
+      <h2 style="font-size:20px;color:var(--green-dark);margin-bottom:16px">🏆 Leaderboard</h2>
+      <div id="leaderboard-list"></div>
+    </div>
+
+    <!-- UGC Upload -->
+    <div class="card" style="margin-bottom:24px">
+      <h2 style="font-size:20px;color:var(--green-dark);margin-bottom:8px">📸 Share Your Breakfast Story</h2>
+      <p style="color:#888;font-size:14px;margin-bottom:16px">Upload a photo and caption to earn 200 Eggscape Points.</p>
+      <div id="ugc-form">
+        <div style="display:grid;gap:12px">
+          <div class="upload-area"><div style="font-size:32px;margin-bottom:8px">📷</div><div style="color:#888;font-size:14px">Click to upload your breakfast photo</div><div style="color:#aaa;font-size:12px;margin-top:4px">JPG, PNG up to 10MB (mock upload)</div></div>
+          <textarea id="ugc-caption" placeholder="Tell us about your fresh egg experience..." class="input-style" style="min-height:80px;resize:vertical"></textarea>
+          <div class="grid-2">
+            <div><label class="label-style">City</label><select id="ugc-city" class="input-style"><option>Orlando</option><option>Miami</option></select></div>
+            <div><label class="label-style">Social Handle</label><input id="ugc-handle" class="input-style" placeholder="@yourhandle" /></div>
+          </div>
+          <button onclick="submitUGC()" style="background:var(--red);color:#fff;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;font-family:'DM Sans',sans-serif">Submit &amp; Earn 200 Points 🥚</button>
+        </div>
+      </div>
+      <div id="ugc-success" class="hidden" style="text-align:center;padding:20px 0">
+        <div style="font-size:40px;margin-bottom:8px">🎉</div>
+        <div style="font-weight:700;color:var(--green-mid);font-size:16px">Submission received! +200 Eggscape Points</div>
+        <div style="color:#888;font-size:13px;margin-top:6px">Under admin review. Approved entries appear in the gallery.</div>
+      </div>
+    </div>
+
+    <h2 style="font-size:20px;color:var(--green-dark);margin-bottom:16px">🖼 Community Gallery</h2>
+    <div class="gallery-grid" id="ugc-gallery"></div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PAGE ===== -->
+<div id="page-admin" class="page" style="background:var(--bg);min-height:100vh">
+  <div class="admin-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 style="font-size:24px;color:var(--green-dark);margin-bottom:4px">Admin – Order Dashboard</h1>
+        <p style="color:#888;font-size:14px">Manage delivery queues, assign drivers, and track all orders.</p>
+      </div>
+      <div style="display:flex;gap:16px" id="admin-stats"></div>
+    </div>
+    <div class="admin-tabs" id="admin-tabs"></div>
+    <div class="card">
+      <div id="admin-table-wrap" class="overflow-x"></div>
+    </div>
+    <div style="margin-top:24px">
+      <h2 style="font-size:18px;color:var(--green-dark);margin-bottom:16px">Customer Signups</h2>
+      <div class="card">
+        <div class="overflow-x">
+          <table>
+            <thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>City</th><th>Eligibility</th><th>Joined</th></tr></thead>
+            <tbody id="admin-customers-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN MARKETING PAGE ===== -->
+<div id="page-adminmarketing" class="page" style="background:var(--bg);min-height:100vh;padding:32px 24px">
+  <div style="max-width:1000px;margin:0 auto">
+    <h1 style="font-size:24px;color:var(--green-dark);margin-bottom:24px">Admin – Great Eggscape Dashboard</h1>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:28px" id="mkt-stats"></div>
+    <div class="card">
+      <h2 style="font-size:18px;color:var(--green-dark);margin-bottom:16px">UGC Submissions</h2>
+      <div id="mkt-ugc-list" style="display:grid;gap:14px"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:10px">
+    <span style="font-size:24px">🥚</span>
+    <span style="font-weight:800;font-size:18px;color:#fff;font-family:'Playfair Display',serif">FreshNest Farms</span>
+  </div>
+  <p style="color:#5a8040;font-size:13px;margin:0">Ultra-fresh eggs · Orlando &amp; Miami Beta · Family-owned since 1987</p>
+  <p style="color:#3a5030;font-size:12px;margin-top:6px">📍 Production stack: React · Supabase · Twilio · SendGrid · Stripe · Google Maps API · QR library · Drone dispatch API</p>
+</footer>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const MOCK_CUSTOMERS = [
+  { id: 1, name: "Emily Carter", email: "emily@example.com", phone: "407-555-0192", city: "Orlando", address: "214 Oak Blossom Lane, Orlando, FL 32801", deliveryOption: "home", householdSize: 3, eligibility: "home_delivery", joined: "2025-05-01", password: "pass" },
+  { id: 2, name: "Marcus Reed", email: "marcus@example.com", phone: "305-555-0148", city: "Miami", address: "88 Brickell Ave, Miami, FL 33131", deliveryOption: "kiosk", householdSize: 2, eligibility: "kiosk_pickup", joined: "2025-05-03", password: "pass" },
+  { id: 3, name: "Sofia Alvarez", email: "sofia@example.com", phone: "407-555-0287", city: "Orlando", address: "900 Lake Eola Dr, Orlando, FL 32803", deliveryOption: "drone", householdSize: 4, eligibility: "drone_waitlist", joined: "2025-05-05", password: "pass" },
+  { id: 4, name: "Daniel Brooks", email: "daniel@example.com", phone: "305-555-0399", city: "Miami", address: "2000 NW 57th Ave, Miami, FL 33142", deliveryOption: "home", householdSize: 1, eligibility: "outside_radius", joined: "2025-05-06", password: "pass" },
+];
+let ORDERS = [
+  { id: "EGG-1001", customerId: 1, customer: "Emily Carter", city: "Orlando", product: "18-Count Family Pack", quantity: 2, method: "truck", status: "out_for_delivery", date: "2025-05-10", freshness: "May 8", amount: 28.00, driverId: "D-04", qrCode: null },
+  { id: "EGG-1002", customerId: 2, customer: "Marcus Reed", city: "Miami", product: "12-Count Farm Fresh", quantity: 1, method: "kiosk", status: "qr_ready", date: "2025-05-11", freshness: "May 9", amount: 14.99, driverId: null, qrCode: "QR-MCK-7742" },
+  { id: "EGG-1003", customerId: 3, customer: "Sofia Alvarez", city: "Orlando", product: "30-Count Weekly Crate", quantity: 1, method: "drone", status: "awaiting_approval", date: "2025-05-12", freshness: "May 10", amount: 34.99, driverId: null, qrCode: null },
+  { id: "EGG-1004", customerId: 1, customer: "Emily Carter", city: "Orlando", product: "12-Count Farm Fresh", quantity: 3, method: "truck", status: "delivered", date: "2025-05-05", freshness: "May 3", amount: 44.97, driverId: "D-02", qrCode: null },
+  { id: "EGG-1005", customerId: 2, customer: "Marcus Reed", city: "Miami", product: "18-Count Family Pack", quantity: 1, method: "kiosk", status: "delivered", date: "2025-05-01", freshness: "Apr 29", amount: 14.00, driverId: null, qrCode: "QR-MCK-5510" },
+];
+let UGC_ENTRIES = [
+  { id: 1, user: "Jess M.", city: "Orlando", handle: "@jessybreakfast", caption: "Sunday scrambled eggs from the freshest pack I've ever cracked 🍳", approved: true, date: "May 4" },
+  { id: 2, user: "Carlos V.", city: "Miami", handle: "@carlos.eats", caption: "These eggs honestly changed my omelette game. Zero comparison to store eggs.", approved: true, date: "May 6" },
+  { id: 3, user: "Priya K.", city: "Orlando", handle: "@priyakitchen", caption: "My kids can taste the difference. Golden yolks every single time!", approved: false, date: "May 7" },
+  { id: 4, user: "Tamara W.", city: "Miami", handle: "@tamcooks", caption: "Fresh is an understatement. This is farm magic in a carton.", approved: true, date: "May 8" },
+];
+const MOCK_LEADERBOARD = [
+  { rank: 1, name: "Jess M.", city: "Orlando", points: 1420, reward: "Free Month" },
+  { rank: 2, name: "Carlos V.", city: "Miami", points: 1100, reward: "50% Off Order" },
+  { rank: 3, name: "Priya K.", city: "Orlando", points: 980, reward: "Early Access" },
+  { rank: 4, name: "Tamara W.", city: "Miami", points: 870, reward: "Early Access" },
+  { rank: 5, name: "Liam O.", city: "Orlando", points: 760, reward: "10% Off" },
+  { rank: 6, name: "Sofia A.", city: "Orlando", points: 640, reward: "10% Off" },
+];
+const MOCK_NOTIFICATIONS = [
+  { id: 1, type: "email", event: "beta_signup", title: "Welcome to FreshNest Beta!", body: "You're officially on the waitlist! We'll notify you when delivery opens in your area. Your farm-fresh eggs are coming soon.", time: "May 1, 9:00 AM" },
+  { id: 2, type: "email", event: "order_confirm", title: "Order Confirmed – #EGG-1001", body: "Your farm-fresh eggs are confirmed. Eggs were packed today and are under 10 days old. Estimated delivery: May 12.", time: "May 10, 11:05 AM" },
+  { id: 3, type: "sms", event: "delivery_scheduled", title: "Delivery Scheduled", body: "Your FreshNest delivery is scheduled for tomorrow between 9–11 AM. Eggs packed: May 8. Freshness: guaranteed under 10 days.", time: "May 11, 8:00 AM" },
+  { id: 4, type: "sms", event: "out_for_delivery", title: "Your Eggs Are On The Way!", body: "Your delivery is out for delivery. Driver: James (D-04) is heading your way. Track at freshnest.farm/track.", time: "May 12, 9:30 AM" },
+  { id: 5, type: "email", event: "delivered", title: "Delivered! How fresh were they?", body: "Your eggs have been delivered. Leave a review and earn 50 Egg Points. Thanks for being a FreshNest beta customer!", time: "May 12, 11:45 AM" },
+  { id: 6, type: "sms", event: "qr_ready", title: "QR Code Ready for Pickup", body: "Your QR code is ready for kiosk pickup at Smart Locker – Miami Brickell. Code: QR-MCK-7742. Expires in 48 hours.", time: "May 11, 2:00 PM" },
+  { id: 7, type: "email", event: "eggscape", title: "You joined The Great Eggscape!", body: "Thanks for joining The Great Eggscape! You've earned 100 Egg Points. Keep playing and uploading to unlock beta perks.", time: "May 5, 3:00 PM" },
+];
+const PRODUCTS = [
+  { id: "12ct", name: "12-Count Farm Fresh Eggs", price: 14.99, desc: "Perfect for households of 1–2. Premium free-range, packed the same day.", badge: "Popular" },
+  { id: "18ct", name: "18-Count Family Pack", price: 21.99, desc: "Ideal for families of 3–4. Our best-seller with golden yolks.", badge: "Best Value" },
+  { id: "30ct", name: "30-Count Weekly Crate", price: 34.99, desc: "The full weekly supply for busy households. Deep savings per egg.", badge: "Max Fresh" },
+];
+const DELIVERY_METHODS = [
+  { id: "truck", label: "Home Delivery – Truck", icon: "🚚", note: "Delivered by 11 AM in your window" },
+  { id: "kiosk", label: "Smart Locker Kiosk Pickup", icon: "📦", note: "Scan QR code at nearest locker" },
+  { id: "drone", label: "Drone Delivery (Beta)", icon: "🚁", note: "Manual admin approval required" },
+];
+const SLOTS = ["Mon May 13, 9–11 AM", "Mon May 13, 2–4 PM", "Tue May 14, 9–11 AM", "Tue May 14, 2–4 PM", "Wed May 15, 9–11 AM"];
+const STATUS_MAP = {
+  out_for_delivery: { label: "Out for Delivery", color: "#e67e22", bg: "#fef3e2" },
+  qr_ready: { label: "QR Ready", color: "#2980b9", bg: "#eaf4fb" },
+  awaiting_approval: { label: "Awaiting Approval", color: "#8e44ad", bg: "#f4eafb" },
+  delivered: { label: "Delivered", color: "#27ae60", bg: "#e8f8ef" },
+  confirmed: { label: "Confirmed", color: "#16a085", bg: "#e8f8f5" },
+  packed: { label: "Packed", color: "#2ecc71", bg: "#e9faf1" },
+  outside_radius: { label: "Outside Radius", color: "#c0392b", bg: "#fdf2f0" },
+  home_delivery: { label: "Home Delivery Eligible", color: "#27ae60", bg: "#e8f8ef" },
+  kiosk_pickup: { label: "Kiosk Pickup Eligible", color: "#2980b9", bg: "#eaf4fb" },
+  drone_waitlist: { label: "Drone Beta Waitlist", color: "#8e44ad", bg: "#f4eafb" },
+};
+const METHOD_MAP = { truck: "🚚 Truck Delivery", kiosk: "📦 Kiosk Pickup", drone: "🚁 Drone (Beta)" };
+
+// ============================================================
+// STATE
+// ============================================================
+let currentPage = "landing";
+let currentUser = null;
+let adminMode = false;
+let eligCity = "Orlando";
+let orderStep = 1;
+let selectedProduct = null;
+let selectedQty = 1;
+let selectedMethod = null;
+let selectedSlot = null;
+let adminTab = "new";
+let gameInterval = null;
+let gameTimer = null;
+let gameScore = 0;
+let gameTimeLeft = 20;
+let gamePlaying = false;
+let gameEggs = [];
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  renderNav();
+  renderSubNav();
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'kiosk') renderKiosk();
+  if (page === 'admin') renderAdmin();
+  if (page === 'notifications') renderNotifications();
+  if (page === 'eggscape') renderEggscape();
+  if (page === 'adminmarketing') renderAdminMarketing();
+  if (page === 'order') initOrder();
+  window.scrollTo(0, 0);
+}
+
+function renderNav() {
+  const btns = document.getElementById('nav-btns');
+  if (currentUser) {
+    btns.innerHTML = `
+      <button onclick="navigate('dashboard')" class="btn" style="${currentPage==='dashboard'?'background:#e8f0da;':''} color:#3a6020">Dashboard</button>
+      <button onclick="navigate('order')" class="btn btn-primary">Order Eggs</button>
+      ${adminMode ? `<button onclick="navigate('admin')" class="btn btn-admin">Admin</button>` : ''}
+      <button onclick="doLogout()" class="btn" style="color:#888">Logout</button>
+    `;
+  } else {
+    btns.innerHTML = `
+      <button onclick="navigate('landing')" class="btn" style="color:#555">Home</button>
+      <button onclick="navigate('eggscape')" class="btn" style="color:#c0392b">🎮 Eggscape</button>
+      <button onclick="navigate('login')" class="btn btn-primary">Login / Sign Up</button>
+    `;
+  }
+}
+
+function renderSubNav() {
+  const sub = document.getElementById('sub-nav');
+  const pages = currentUser
+    ? [
+        {id:'dashboard',label:'📊 Dashboard'},
+        {id:'order',label:'🛒 Order'},
+        {id:'kiosk',label:'📦 Kiosk Pickup'},
+        {id:'notifications',label:'🔔 Notifications'},
+        {id:'eggscape',label:'🎮 Eggscape'},
+        ...(adminMode ? [{id:'admin',label:'⚙️ Admin Orders'},{id:'adminmarketing',label:'📣 Admin Marketing'}] : [])
+      ]
+    : [
+        {id:'landing',label:'Home'},
+        {id:'signup',label:'Join Beta'},
+        {id:'eggscape',label:'🎮 Eggscape'},
+        {id:'notifications',label:'Notifications'},
+      ];
+  sub.innerHTML = pages.map(p => `<button class="sub-btn ${currentPage===p.id?'active':''}" onclick="navigate('${p.id}')">${p.label}</button>`).join('');
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function statusBadge(status) {
+  const s = STATUS_MAP[status] || { label: status, color: '#666', bg: '#f0f0f0' };
+  return `<span class="status-badge" style="background:${s.bg};color:${s.color}">${s.label}</span>`;
+}
+function avatarHTML(name, size=40, color='#5a7a3a') {
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${color};font-size:${size*0.35}px">${initials}</div>`;
+}
+function reviewRow(k, v) {
+  return `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #f0ece6;padding-bottom:8px"><span style="font-size:13px;color:#888">${k}</span><span style="font-size:14px;font-weight:600;color:#333">${v}</span></div>`;
+}
+
+// ============================================================
+// ELIGIBILITY CHECKER
+// ============================================================
+function setCity(city) {
+  eligCity = city;
+  document.getElementById('city-orlando').style.background = city==='Orlando' ? 'var(--green-mid)' : '#fff';
+  document.getElementById('city-orlando').style.color = city==='Orlando' ? '#fff' : '#555';
+  document.getElementById('city-orlando').style.borderColor = city==='Orlando' ? 'var(--green-mid)' : '#ddd';
+  document.getElementById('city-miami').style.background = city==='Miami' ? 'var(--green-mid)' : '#fff';
+  document.getElementById('city-miami').style.color = city==='Miami' ? '#fff' : '#555';
+  document.getElementById('city-miami').style.borderColor = city==='Miami' ? 'var(--green-mid)' : '#ddd';
+}
+function checkEligibility() {
+  const addr = document.getElementById('elig-addr').value.toLowerCase();
+  const res = document.getElementById('elig-result');
+  if (!addr.trim()) return;
+  let msg, detail, good=true;
+  if (addr.includes('32801')||addr.includes('oak blossom')||addr.includes('eola')||eligCity==='Orlando') {
+    msg='✅ Eligible for Home Delivery!'; detail="You're within the 5-mile Orlando Farm Hub radius.";
+  } else if (addr.includes('33131')||addr.includes('brickell')||eligCity==='Miami') {
+    msg='📦 Eligible for Kiosk Pickup!'; detail='You\'re near the Miami Beta Hub smart locker on Brickell Ave.';
+  } else {
+    msg='⏳ Coming Soon to Your Area'; detail='We\'re expanding fast! Join the waitlist and be first to know.'; good=false;
+  }
+  res.style.display='block';
+  res.style.background = good ? '#f0faf3' : '#fef9f0';
+  res.style.border = `1.5px solid ${good?'#2ecc71':'#f0ad4e'}`;
+  res.innerHTML = `<div style="font-weight:700;font-size:15px;margin-bottom:4px">${msg}</div><div style="font-size:13px;color:#666">${detail}</div>`;
+}
+
+// ============================================================
+// SIGNUP
+// ============================================================
+function submitSignup() {
+  document.getElementById('signup-form-wrap').classList.add('hidden');
+  const s = document.getElementById('signup-success');
+  s.classList.remove('hidden');
+  s.style.display = 'flex';
+}
+
+// ============================================================
+// LOGIN / LOGOUT
+// ============================================================
+function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  const u = MOCK_CUSTOMERS.find(c => c.email===email && c.password===pass);
+  const err = document.getElementById('login-error');
+  if (u) {
+    currentUser = u;
+    adminMode = u.id === 1;
+    err.style.display = 'none';
+    navigate('dashboard');
+  } else {
+    err.style.display = 'block';
+    err.textContent = 'Invalid email or password. Try emily@example.com / pass';
+  }
+}
+function doLogout() { currentUser=null; adminMode=false; navigate('landing'); }
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  if (!currentUser) return;
+  const u = currentUser;
+  const myOrders = ORDERS.filter(o => o.customerId===u.id);
+  const activeOrder = myOrders.find(o => o.status!=='delivered');
+  const elig = STATUS_MAP[u.eligibility] || {label:u.eligibility,color:'#666',bg:'#f0f0f0'};
+
+  document.getElementById('dash-avatar').textContent = u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('dash-welcome').textContent = `Welcome back, ${u.name.split(' ')[0]}! 👋`;
+  document.getElementById('dash-city').textContent = `${u.city} Beta Member`;
+  document.getElementById('dash-elig').innerHTML = `<span class="status-badge" style="background:${elig.bg};color:${elig.color}">${elig.label}</span>`;
+  document.getElementById('stat-orders').textContent = myOrders.length;
+  document.getElementById('stat-eggs').textContent = myOrders.reduce((a,o)=>a+(12)*o.quantity,0)+'+';
+  document.getElementById('stat-joined').textContent = u.joined;
+
+  // Active order
+  const aoc = document.getElementById('active-order-content');
+  if (activeOrder) {
+    aoc.innerHTML = `
+      <div style="font-weight:700;font-size:14px;color:#333;margin-bottom:8px">#${activeOrder.id}</div>
+      <div style="font-size:13px;color:#666;margin-bottom:4px">${activeOrder.product} × ${activeOrder.quantity}</div>
+      <div style="font-size:13px;color:#666;margin-bottom:4px">Method: ${METHOD_MAP[activeOrder.method]}</div>
+      <div style="font-size:13px;color:#666;margin-bottom:12px">Freshness date: ${activeOrder.freshness}</div>
+      ${statusBadge(activeOrder.status)}
+      ${activeOrder.status==='qr_ready' ? `<div style="margin-top:12px"><button onclick="navigate('kiosk')" style="background:var(--blue);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif">View QR Code →</button></div>` : ''}
+    `;
+  } else {
+    aoc.innerHTML = `<div style="text-align:center;padding:20px 0;color:#aaa;font-size:14px">No active orders.<br><span onclick="navigate('order')" style="color:var(--green-mid);cursor:pointer;font-weight:600">Place your first order →</span></div>`;
+  }
+
+  // Profile
+  document.getElementById('profile-content').innerHTML = [
+    ['📧 Email', u.email], ['📱 Phone', u.phone], ['📍 Address', u.address],
+    ['🏠 Household', `${u.householdSize} people`], ['🚚 Preferred Delivery', u.deliveryOption]
+  ].map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:#888">${k}</span><span style="font-size:13px;color:#333;font-weight:500;text-align:right;max-width:60%">${v}</span></div>`).join('');
+
+  // Order history
+  document.getElementById('order-history-body').innerHTML = myOrders.map(o => `
+    <tr>
+      <td><span style="font-weight:700;color:var(--green-mid)">#${o.id}</span></td>
+      <td>${o.product}</td>
+      <td>${METHOD_MAP[o.method]}</td>
+      <td>${o.date}</td>
+      <td>${o.freshness}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td style="font-weight:700">$${o.amount.toFixed(2)}</td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// ORDER FLOW
+// ============================================================
+function initOrder() {
+  orderStep=1; selectedProduct=null; selectedQty=1; selectedMethod=null; selectedSlot=null;
+  ['order-step-1','order-step-2','order-step-3','order-step-4'].forEach(id => {
+    document.getElementById(id).classList.remove('hidden');
+  });
+  document.getElementById('order-confirmed').classList.add('hidden');
+  document.getElementById('order-confirmed').style.display='none';
+  showOrderStep(1);
+  renderProducts(); renderMethods(); renderSlots(); renderStepProgress();
+}
+function renderStepProgress() {
+  document.getElementById('step-progress').innerHTML = [1,2,3,4].map(s => `
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="step-dot flex-center" style="background:${orderStep>=s?'var(--green-mid)':'#ddd'};color:${orderStep>=s?'#fff':'#aaa'}">${s}</div>
+      ${s<4 ? `<div class="step-connector" style="background:${orderStep>s?'var(--green-mid)':'#ddd'}"></div>` : ''}
+    </div>
+  `).join('');
+}
+function showOrderStep(step) {
+  [1,2,3,4].forEach(s => {
+    const el = document.getElementById('order-step-'+s);
+    if (el) el.classList.toggle('hidden', s!==step);
+  });
+  orderStep=step; renderStepProgress();
+}
+function goOrderStep(step) { showOrderStep(step); }
+function renderProducts() {
+  document.getElementById('products-list').innerHTML = PRODUCTS.map(p => `
+    <div class="product-card ${selectedProduct?.id===p.id?'selected':''}" onclick="selectProduct('${p.id}')">
+      <div>
+        <div style="font-weight:700;font-size:16px;color:var(--green-dark);margin-bottom:4px">${p.name}</div>
+        <div style="font-size:13px;color:#888">${p.desc}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-weight:800;font-size:20px;color:var(--green-mid)">$${p.price}</div>
+        <span style="background:#e8f0da;color:var(--green-mid);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600">${p.badge}</span>
+      </div>
+    </div>
+  `).join('');
+}
+function selectProduct(id) {
+  selectedProduct = PRODUCTS.find(p=>p.id===id);
+  renderProducts();
+  const btn = document.getElementById('step1-next');
+  btn.disabled=false; btn.style.background='var(--green-mid)'; btn.style.cursor='pointer';
+}
+function setQty(n) {
+  selectedQty=n;
+  document.querySelectorAll('.qty-btn').forEach(b => {
+    const q=parseInt(b.dataset.qty);
+    b.style.border=`2px solid ${q===n?'var(--green-mid)':'#ddd'}`;
+    b.style.background=q===n?'var(--green-mid)':'#fff';
+    b.style.color=q===n?'#fff':'#555';
+  });
+}
+function renderMethods() {
+  document.getElementById('methods-list').innerHTML = DELIVERY_METHODS.map(m => `
+    <div class="method-card ${selectedMethod?.id===m.id?'selected':''}" onclick="selectMethod('${m.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:700;font-size:16px;color:var(--green-dark)">${m.icon} ${m.label}</div>
+          <div style="font-size:13px;color:#888;margin-top:4px">${m.note}</div>
+        </div>
+        ${m.id==='drone'?`<span style="background:#f4eafb;color:#8e44ad;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600">Beta</span>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+function selectMethod(id) {
+  selectedMethod = DELIVERY_METHODS.find(m=>m.id===id);
+  renderMethods();
+  const btn = document.getElementById('step2-next');
+  btn.disabled=false; btn.style.background='var(--green-mid)'; btn.style.cursor='pointer';
+}
+function renderSlots() {
+  document.getElementById('slots-list').innerHTML = SLOTS.map(s => `
+    <div class="slot-card ${selectedSlot===s?'selected':''}" onclick="selectSlot('${s}')">📅 ${s}</div>
+  `).join('');
+}
+function selectSlot(s) {
+  selectedSlot=s; renderSlots();
+  const btn = document.getElementById('step3-next');
+  btn.disabled=false; btn.style.background='var(--green-mid)'; btn.style.cursor='pointer';
+}
+function renderReview() {
+  const total = selectedProduct ? selectedProduct.price * selectedQty : 0;
+  document.getElementById('review-details').innerHTML = [
+    ['Product', `${selectedProduct?.name} × ${selectedQty}`],
+    ['Delivery Method', selectedMethod ? METHOD_MAP[selectedMethod.id] : ''],
+    ['Slot', selectedSlot],
+    ['Delivery Address', currentUser?.address],
+    ['Freshness Guarantee', 'Under 10 days from pack date ✅'],
+    ['Total', `$${total.toFixed(2)}`],
+  ].map(([k,v]) => reviewRow(k,v)).join('');
+}
+function placeOrder() {
+  const total = selectedProduct ? selectedProduct.price * selectedQty : 0;
+  const newOrder = {
+    id: `EGG-100${ORDERS.length+2}`,
+    customerId: currentUser.id,
+    customer: currentUser.name,
+    city: currentUser.city,
+    product: selectedProduct.name,
+    quantity: selectedQty,
+    method: selectedMethod.id,
+    status: selectedMethod.id==='drone' ? 'awaiting_approval' : selectedMethod.id==='kiosk' ? 'qr_ready' : 'confirmed',
+    date: new Date().toISOString().slice(0,10),
+    freshness: new Date().toISOString().slice(5,10),
+    amount: total,
+    driverId: null,
+    qrCode: selectedMethod.id==='kiosk' ? `QR-NEW-${Math.floor(Math.random()*9000+1000)}` : null,
+  };
+  ORDERS.unshift(newOrder);
+  // Show confirmed
+  ['order-step-1','order-step-2','order-step-3','order-step-4'].forEach(id=>{
+    document.getElementById(id).classList.add('hidden');
+  });
+  const conf = document.getElementById('order-confirmed');
+  conf.classList.remove('hidden'); conf.style.display='flex';
+  document.getElementById('confirmed-slot').textContent = selectedSlot||'To be confirmed';
+  document.getElementById('confirmed-summary').innerHTML = `<div>📦 ${selectedProduct.name} × ${selectedQty}</div><div>${METHOD_MAP[selectedMethod.id]}</div><div>💰 Total: $${total.toFixed(2)}</div>`;
+  document.getElementById('drone-note').style.display = selectedMethod.id==='drone' ? 'block' : 'none';
+  const qrBtn = document.getElementById('get-qr-btn');
+  qrBtn.style.display = selectedMethod.id==='kiosk' ? 'flex' : 'none';
+}
+// Intercept step 4 to render review
+const origGoStep = goOrderStep;
+window.goOrderStep = function(step) {
+  showOrderStep(step);
+  if (step===4) renderReview();
+};
+
+// ============================================================
+// KIOSK
+// ============================================================
+function renderKiosk() {
+  if (!currentUser) return;
+  const kioskOrder = ORDERS.find(o=>o.customerId===currentUser.id && o.method==='kiosk' && o.status==='qr_ready');
+  document.getElementById('kiosk-no-order').style.display='none';
+  document.getElementById('kiosk-redeemed').classList.add('hidden');
+  document.getElementById('kiosk-main').style.display='block';
+  if (!kioskOrder) {
+    document.getElementById('kiosk-main').style.display='none';
+    document.getElementById('kiosk-no-order').style.display='flex';
+    return;
+  }
+  document.getElementById('kiosk-order-id').textContent = `Order #${kioskOrder.id}`;
+  document.getElementById('kiosk-product').textContent = kioskOrder.product;
+  document.getElementById('qr-code-label').textContent = kioskOrder.qrCode;
+  // QR grid
+  const code = kioskOrder.qrCode||'QR';
+  document.getElementById('qr-grid').innerHTML = Array.from({length:49}).map((_,i)=>{
+    const on=(i+code.charCodeAt(i%code.length))%3!==0;
+    return `<div class="qr-cell" style="background:${on?'var(--green-dark)':'#fff'}"></div>`;
+  }).join('');
+  const isM=kioskOrder.city==='Miami';
+  document.getElementById('kiosk-location').innerHTML = `Smart Locker – ${isM?'Miami Brickell':'Orlando Downtown'}<br>${isM?'801 Brickell Bay Dr, Miami, FL':'150 E Church St, Orlando, FL'}`;
+  const steps=['Go to the smart locker location','Tap \'Scan QR Code\' on the kiosk screen','Hold your phone QR code up to the reader','Locker D-14 will open automatically','Retrieve your egg carton — goodbye grocery eggs!'];
+  document.getElementById('kiosk-steps').innerHTML = steps.map((s,i)=>`<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--green-mid);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${i+1}</div><div style="font-size:13px;color:#555;line-height:1.5">${s}</div></div>`).join('');
+}
+function redeemKiosk() {
+  if (!currentUser) return;
+  const ord = ORDERS.find(o=>o.customerId===currentUser.id && o.method==='kiosk' && o.status==='qr_ready');
+  if (ord) ord.status='delivered';
+  document.getElementById('kiosk-main').style.display='none';
+  document.getElementById('kiosk-redeemed').classList.remove('hidden');
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function renderNotifications() {
+  document.getElementById('notifications-list').innerHTML = MOCK_NOTIFICATIONS.map(n=>{
+    const isEmail=n.type==='email';
+    const bg=isEmail?'#eaf4fb':'#fef9f0';
+    const border=isEmail?'#b5d4f4':'#fac775';
+    const label=isEmail?'#2980b9':'#c0392b';
+    return `
+      <div class="notif-card" style="background:${bg};border:1.5px solid ${border}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px">${isEmail?'📧':'📱'}</span>
+            <div>
+              <div style="font-weight:700;font-size:15px;color:var(--green-dark)">${n.title}</div>
+              <span style="background:${label};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600">${isEmail?'Email':'SMS'}</span>
+            </div>
+          </div>
+          <span style="font-size:12px;color:#aaa;white-space:nowrap;margin-left:12px">${n.time}</span>
+        </div>
+        <p style="font-size:14px;color:#444;line-height:1.7;margin:0">${n.body}</p>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// EGGSCAPE
+// ============================================================
+function renderEggscape() {
+  document.getElementById('eggscape-join-btn').style.display = currentUser ? 'none' : 'inline-block';
+  // Leaderboard
+  const rankColors=['#f0ad4e','#ccc','#cd7f32'];
+  document.getElementById('leaderboard-list').innerHTML = MOCK_LEADERBOARD.map(l=>`
+    <div class="leaderboard-row ${l.rank===1?'gold':''}">
+      <div class="rank-badge" style="background:${l.rank<=3?rankColors[l.rank-1]:'#e8f0da'};color:${l.rank<=3?'#fff':'var(--green-mid)'}">${l.rank}</div>
+      ${avatarHTML(l.name,36,'#5a7a3a')}
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">${l.name}</div><div style="font-size:12px;color:#888">${l.city}</div></div>
+      <div style="text-align:right"><div style="font-weight:800;font-size:16px;color:var(--red)">${l.points} pts</div><div style="font-size:11px;color:#888">${l.reward}</div></div>
+    </div>
+  `).join('');
+  renderGallery();
+}
+function renderGallery() {
+  const colors=['#e8f0da','#fef9f0','#eaf4fb','#f4eafb','#f7f4ef','#e8f8ef'];
+  document.getElementById('ugc-gallery').innerHTML = UGC_ENTRIES.filter(u=>u.approved).map((u,i)=>`
+    <div class="card">
+      <div style="height:120px;border-radius:10px;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:12px">🍳</div>
+      <p style="font-size:13px;color:#444;line-height:1.6;font-style:italic;font-family:'Playfair Display',serif;margin-bottom:10px">"${u.caption}"</p>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700;font-size:13px">${u.user}</div><div style="font-size:12px;color:#888">${u.handle} · ${u.city}</div></div>
+        <div style="font-size:11px;color:#aaa">${u.date}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function submitUGC() {
+  const cap=document.getElementById('ugc-caption').value;
+  if(!cap) return;
+  UGC_ENTRIES.unshift({id:Date.now(),user:'You',city:document.getElementById('ugc-city').value,handle:document.getElementById('ugc-handle').value,caption:cap,approved:false,date:'Today'});
+  document.getElementById('ugc-form').style.display='none';
+  document.getElementById('ugc-success').classList.remove('hidden');
+}
+
+// ============================================================
+// MINI GAME
+// ============================================================
+function startGame() {
+  gameScore=0; gameTimeLeft=20; gamePlaying=true; gameEggs=[];
+  clearInterval(gameInterval); clearInterval(gameTimer);
+  document.getElementById('game-start-wrap').classList.add('hidden');
+  document.getElementById('game-active-wrap').classList.remove('hidden');
+  document.getElementById('game-overlay').style.display='none';
+  document.getElementById('game-score').textContent='Score: 0 pts';
+  document.getElementById('game-timer').textContent='⏱ 20s';
+  document.getElementById('game-timer').style.color='#555';
+  spawnGameEgg();
+  gameTimer=setInterval(()=>{
+    gameTimeLeft--;
+    document.getElementById('game-timer').textContent=`⏱ ${gameTimeLeft}s`;
+    document.getElementById('game-timer').style.color=gameTimeLeft<6?'var(--red)':'#555';
+    if(gameTimeLeft<=0){
+      clearInterval(gameTimer); clearInterval(gameInterval);
+      gamePlaying=false;
+      const area=document.getElementById('game-area');
+      area.querySelectorAll('.egg-target').forEach(e=>e.remove());
+      const ov=document.getElementById('game-overlay');
+      ov.style.display='flex';
+      document.getElementById('game-over-score').textContent=`Game Over! ${gameScore} pts`;
+      document.getElementById('game-discount').style.display=gameScore>=100?'block':'none';
+    }
+  },1000);
+}
+function spawnGameEgg() {
+  if(!gamePlaying && gameTimeLeft<=0) return;
+  const area=document.getElementById('game-area');
+  if(!area) return;
+  const id='egg-'+Date.now();
+  const x=Math.random()*80+5;
+  const y=Math.random()*70+10;
+  const el=document.createElement('div');
+  el.className='egg-target';
+  el.id=id; el.textContent='🥚';
+  el.style.left=x+'%'; el.style.top=y+'%';
+  el.onclick=()=>catchGameEgg(id);
+  area.appendChild(el);
+  setTimeout(()=>{if(document.getElementById(id))document.getElementById(id).remove();},2000);
+  if(gamePlaying||gameTimeLeft>0) gameInterval=setTimeout(spawnGameEgg,1200+Math.random()*800);
+}
+function catchGameEgg(id) {
+  const el=document.getElementById(id);
+  if(el){el.remove();gameScore+=10;document.getElementById('game-score').textContent=`Score: ${gameScore} pts`;}
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+function renderAdmin() {
+  const tabs=[
+    {id:'new',label:'New Orders'},
+    {id:'truck',label:'🚚 Truck Queue'},
+    {id:'drone',label:'🚁 Drone Queue'},
+    {id:'kiosk',label:'📦 Kiosk Queue'},
+    {id:'completed',label:'✅ Completed'},
+  ];
+  document.getElementById('admin-tabs').innerHTML = tabs.map(t=>`<button class="tab-btn ${adminTab===t.id?'active':''}" onclick="setAdminTab('${t.id}')">${t.label}</button>`).join('');
+  document.getElementById('admin-stats').innerHTML = [
+    {label:'Total Orders',value:ORDERS.length,color:'var(--green-mid)'},
+    {label:'Active',value:ORDERS.filter(o=>o.status!=='delivered').length,color:'#e67e22'},
+    {label:'Delivered',value:ORDERS.filter(o=>o.status==='delivered').length,color:'#27ae60'},
+  ].map(s=>`<div style="background:#fff;border-radius:10px;padding:10px 16px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.05)"><div style="font-size:11px;color:#888">${s.label}</div><div style="font-size:22px;font-weight:800;color:${s.color}">${s.value}</div></div>`).join('');
+  renderAdminTable();
+  // Customers
+  document.getElementById('admin-customers-body').innerHTML = MOCK_CUSTOMERS.map(c=>`
+    <tr>
+      <td style="display:flex;align-items:center;gap:8px">${avatarHTML(c.name,28,'#3a6020')}<span>${c.name}</span></td>
+      <td style="color:var(--blue)">${c.email}</td>
+      <td>${c.phone}</td>
+      <td>${c.city}</td>
+      <td>${statusBadge(c.eligibility)}</td>
+      <td>${c.joined}</td>
+    </tr>
+  `).join('');
+}
+function setAdminTab(tab) { adminTab=tab; renderAdmin(); }
+function renderAdminTable() {
+  let filtered=ORDERS;
+  if(adminTab==='new') filtered=ORDERS.filter(o=>['confirmed','awaiting_approval'].includes(o.status));
+  else if(adminTab==='truck') filtered=ORDERS.filter(o=>o.method==='truck'&&o.status!=='delivered');
+  else if(adminTab==='drone') filtered=ORDERS.filter(o=>o.method==='drone');
+  else if(adminTab==='kiosk') filtered=ORDERS.filter(o=>o.method==='kiosk');
+  else if(adminTab==='completed') filtered=ORDERS.filter(o=>o.status==='delivered');
+  const wrap=document.getElementById('admin-table-wrap');
+  if(!filtered.length){wrap.innerHTML='<div style="text-align:center;padding:40px 0;color:#aaa">No orders in this queue.</div>';return;}
+  wrap.innerHTML=`<table><thead><tr><th>Order ID</th><th>Customer</th><th>City</th><th>Product</th><th>Method</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${filtered.map(o=>`
+    <tr>
+      <td><span style="font-weight:700;color:var(--green-mid)">#${o.id}</span></td>
+      <td>${o.customer}</td><td>${o.city}</td><td>${o.product}</td>
+      <td>${METHOD_MAP[o.method]}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td>${o.date}</td>
+      <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${o.status==='awaiting_approval'?`<button class="mini-btn" style="background:#e8f0da;color:var(--green-mid)" onclick="adminUpdateStatus('${o.id}','confirmed')">Approve</button>`:''}
+        ${(['confirmed','awaiting_approval'].includes(o.status)&&o.method==='truck')?`<button class="mini-btn" style="background:#fef3e2;color:#e67e22" onclick="adminUpdateStatus('${o.id}','out_for_delivery')">Dispatch</button>`:''}
+        ${o.status==='out_for_delivery'?`<button class="mini-btn" style="background:#e8f8ef;color:#27ae60" onclick="adminUpdateStatus('${o.id}','delivered')">Mark Delivered</button>`:''}
+        ${(o.method==='truck'&&!o.driverId&&o.status!=='delivered')?`<select class="mini-btn" onchange="adminAssignDriver('${o.id}',this.value)"><option value="">Assign Driver</option>${['D-01 James','D-02 Sarah','D-03 Mike','D-04 Lisa'].map(d=>`<option value="${d}">${d}</option>`).join('')}</select>`:''}
+        ${o.driverId?`<span style="font-size:11px;color:#888">Driver: ${o.driverId}</span>`:''}
+      </div></td>
+    </tr>
+  `).join('')}</tbody></table>`;
+}
+function adminUpdateStatus(id, status) {
+  const o=ORDERS.find(o=>o.id===id); if(o) o.status=status; renderAdmin();
+}
+function adminAssignDriver(id, driver) {
+  const o=ORDERS.find(o=>o.id===id); if(o) o.driverId=driver; renderAdmin();
+}
+
+// ============================================================
+// ADMIN MARKETING
+// ============================================================
+function renderAdminMarketing() {
+  document.getElementById('mkt-stats').innerHTML = [
+    {label:'Total Uploads',value:UGC_ENTRIES.length,icon:'📸'},
+    {label:'Approved',value:UGC_ENTRIES.filter(e=>e.approved).length,icon:'✅'},
+    {label:'Pending',value:UGC_ENTRIES.filter(e=>!e.approved).length,icon:'⏳'},
+    {label:'Game Plays',value:'142',icon:'🎮'},
+    {label:'Referrals',value:'38',icon:'👥'},
+    {label:'Beta Signups',value:MOCK_CUSTOMERS.length,icon:'🌾'},
+  ].map(s=>`<div class="card" style="text-align:center"><div style="font-size:24px;margin-bottom:4px">${s.icon}</div><div style="font-size:22px;font-weight:800;color:var(--green-dark)">${s.value}</div><div style="font-size:12px;color:#888">${s.label}</div></div>`).join('');
+  document.getElementById('mkt-ugc-list').innerHTML = UGC_ENTRIES.map(e=>`
+    <div style="background:#fff;border-radius:12px;padding:16px 18px;border:1.5px solid ${e.approved?'#b8d8a0':'#f0ece6'};display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <div style="flex:1">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+          ${avatarHTML(e.user,32,'#5a7a3a')}
+          <div>
+            <span style="font-weight:700;font-size:14px">${e.user}</span>
+            <span style="font-size:12px;color:#888;margin-left:6px">${e.handle} · ${e.city} · ${e.date}</span>
+          </div>
+          <span class="status-badge" style="background:${e.approved?'#e8f8ef':'#fef9f0'};color:${e.approved?'#27ae60':'#e67e22'}">${e.approved?'Approved':'Pending Review'}</span>
+        </div>
+        <p style="font-size:13px;color:#555;font-style:italic;font-family:'Playfair Display',serif;margin:0">"${e.caption}"</p>
+      </div>
+      <button class="mini-btn" style="background:${e.approved?'#fdf2f0':'#e8f8ef'};color:${e.approved?'#c0392b':'#27ae60'}" onclick="toggleUGC(${e.id})">${e.approved?'Reject':'Approve'}</button>
+    </div>
+  `).join('');
+}
+function toggleUGC(id) {
+  const e=UGC_ENTRIES.find(e=>e.id===id);
+  if(e) e.approved=!e.approved;
+  renderAdminMarketing();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+navigate('landing');
+</script>
+</body>
+</html>
